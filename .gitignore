@@ -21,3 +21,5 @@ tags
 /__pycache__/
 
 test.py
+test.cpp
+*.exe
