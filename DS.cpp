@@ -3,10 +3,18 @@
 
 #include "DS.h"
 
-struct UnderflowException : public std::exception
-{
+// Exceptions
 
-};
+struct UnderflowException : public std::exception { };
+
+// Node Implementation
+
+template <typename T> Node<T>::Node(T value) {
+  next = NULL;
+  data = value;
+}
+
+// Stack Implementation
 
 template <typename T> Stack<T>::Stack() {
   top = -1;
@@ -42,6 +50,52 @@ template <typename T> void Stack<T>::display() {
   }
   for (int i = 0; i <= top; i++) {
     std::cout << arr[i] << " ";
+  }
+  std::cout << std::endl;
+}
+
+// Queue Implementation
+
+template <typename T> Queue<T>::Queue() {
+  head = NULL;
+  tail = NULL;
+}
+
+template <typename T> bool Queue<T>::is_empty() {
+  return head == NULL;
+}
+
+template <typename T> void Queue<T>::enqueue(T value) {
+  Node<T> *node  = new Node<T>(value);
+  if (head == NULL) {
+    head = node;
+    tail = node;
+  } else {
+    tail->next = node;
+    tail = node;
+  }
+}
+
+template <typename T> T Queue<T>::dequeue() {
+  if (is_empty()) {
+    throw UnderflowException();
+  }
+  Node<T> *node = head;
+  T value = node->data;
+  head = head->next;
+  delete node;
+  return value;
+}
+
+template <typename T> void Queue<T>::display() {
+  if (is_empty()) {
+    std::cout << "Queue is empty." << std::endl;
+    return;
+  }
+  Node<T> *node = head;
+  while (node != NULL) {
+    std::cout << node->data << " ";
+    node = node->next;
   }
   std::cout << std::endl;
 }
