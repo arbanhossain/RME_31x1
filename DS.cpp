@@ -99,3 +99,149 @@ template <typename T> void Queue<T>::display() {
   }
   std::cout << std::endl;
 }
+
+// Max Heap Implementation
+
+template <typename T> MaxHeap<T>::MaxHeap() {
+  end = -1;
+}
+
+template <typename T> MaxHeap<T>::~MaxHeap() {
+  delete[] arr;
+}
+
+template <typename T> void MaxHeap<T>::reheap_up(int index) {
+  if (index == 0) {
+    return;
+  }
+  int parentIdx = (index - 1) / 2;
+  if (arr[parentIdx] < arr[index]) {
+    T temp = arr[parentIdx];
+    arr[parentIdx] = arr[index];
+    arr[index] = temp;
+    reheap_up(parentIdx);
+  }
+}
+
+template <typename T> void MaxHeap<T>::reheap_down(int index) {
+  int leftIdx = 2 * index + 1;
+  int rightIdx = 2 * index + 2;
+  if (leftIdx > end) {
+    return;
+  } else if (rightIdx > end) {
+    if (arr[index] < arr[leftIdx]) {
+      T temp = arr[index];
+      arr[index] = arr[leftIdx];
+      arr[leftIdx] = temp;
+      reheap_down(leftIdx);
+    }
+  } else {
+    if (arr[leftIdx] > arr[rightIdx]) {
+      if (arr[index] < arr[leftIdx]) {
+        T temp = arr[index];
+        arr[index] = arr[leftIdx];
+        arr[leftIdx] = temp;
+        reheap_down(leftIdx);
+      }
+    } else {
+      if (arr[index] < arr[rightIdx]) {
+        T temp = arr[index];
+        arr[index] = arr[rightIdx];
+        arr[rightIdx] = temp;
+        reheap_down(rightIdx);
+      }
+    }
+  }
+}
+
+template <typename T> void MaxHeap<T>::insert(T value) {
+  if (end == LIMIT - 1) {
+    std::cout << "Heap is full. Cannot insert." << std::endl;
+  } else {
+    arr[++end] = value;
+    reheap_up(end);
+  }
+}
+
+template <typename T> T MaxHeap<T>::remove() {
+  if (end == -1) {
+    throw UnderflowException();
+  }
+  T value = arr[0];
+  arr[0] = arr[end--];
+  reheap_down(0);
+  return value;
+}
+
+// Min Heap Implementation
+
+template <typename T> MinHeap<T>::MinHeap() {
+  end = -1;
+}
+
+template <typename T> MinHeap<T>::~MinHeap() {
+  delete[] arr;
+}
+
+template <typename T> void MinHeap<T>::reheap_up(int index) {
+  if (index == 0) {
+    return;
+  }
+  int parentIdx = (index - 1) / 2;
+  if (arr[parentIdx] > arr[index]) {
+    T temp = arr[parentIdx];
+    arr[parentIdx] = arr[index];
+    arr[index] = temp;
+    reheap_up(parentIdx);
+  }
+}
+
+template <typename T> void MinHeap<T>::reheap_down(int index) {
+  int leftIdx = 2 * index + 1;
+  int rightIdx = 2 * index + 2;
+  if (leftIdx > end) {
+    return;
+  } else if (rightIdx > end) {
+    if (arr[index] > arr[leftIdx]) {
+      T temp = arr[index];
+      arr[index] = arr[leftIdx];
+      arr[leftIdx] = temp;
+      reheap_down(leftIdx);
+    }
+  } else {
+    if (arr[leftIdx] < arr[rightIdx]) {
+      if (arr[index] > arr[leftIdx]) {
+        T temp = arr[index];
+        arr[index] = arr[leftIdx];
+        arr[leftIdx] = temp;
+        reheap_down(leftIdx);
+      }
+    } else {
+      if (arr[index] > arr[rightIdx]) {
+        T temp = arr[index];
+        arr[index] = arr[rightIdx];
+        arr[rightIdx] = temp;
+        reheap_down(rightIdx);
+      }
+    }
+  }
+}
+
+template <typename T> void MinHeap<T>::insert(T value) {
+  if (end == LIMIT - 1) {
+    std::cout << "Heap is full. Cannot insert." << std::endl;
+  } else {
+    arr[++end] = value;
+    reheap_up(end);
+  }
+}
+
+template <typename T> T MinHeap<T>::remove() {
+  if (end == -1) {
+    throw UnderflowException();
+  }
+  T value = arr[0];
+  arr[0] = arr[end--];
+  reheap_down(0);
+  return value;
+}
