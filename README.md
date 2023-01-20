@@ -1,6 +1,6 @@
 # RME 3101/3111 Codes
 
-**Course Name**: Introduction to AI
+**Course Name**: Introduction to AI  
 **Course Instructor**: Dr. Sejuti Rahman
 
 ### ToC
