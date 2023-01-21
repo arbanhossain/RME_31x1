@@ -189,3 +189,86 @@ class MinHeap:
         popped = self.arr.pop()
         self.reheap_down(0)
         return popped
+
+class Vertex:
+
+  def __init__(self, value=None):
+    self.value = value
+
+  def __hash__(self):
+    return hash(self.value)
+  
+  def __eq__(self, other):
+    return self.value == other.value
+  
+  def __ne__(self, other):
+    return not(self == other)
+  
+  def __str__(self):
+    return str(self.value)
+
+class Graph:
+
+  def __init__(self):
+    self.adjacency_list = {}
+  
+  def add_undirected_edge(self, v1, v2):
+    if v1 in self.adjacency_list:
+      self.adjacency_list[v1].append(v2)
+    else:
+      self.adjacency_list[v1] = [v2]
+    
+    if v2 in self.adjacency_list:
+      self.adjacency_list[v2].append(v1)
+    else:
+      self.adjacency_list[v2] = [v1]
+  
+  def add_directed_edge(self, v1, v2):
+    if v1 in self.adjacency_list:
+      self.adjacency_list[v1].append(v2)
+    else:
+      self.adjacency_list[v1] = [v2]
+    
+    if v2 not in self.adjacency_list:
+      self.adjacency_list[v2] = []
+  
+  # this traverse will take some time more than O(V+E) as we are also building the traverse_order list [+ O(V.2E)].
+  def bfs_traverse(self, source):
+    traverse_order = []
+    visited = set()
+    queue = Queue()
+    queue.enqueue(source)
+
+    appended = set()
+    traverse_order.append([source])
+    appended.add(source)
+
+    while not queue.is_empty():
+      level = []
+      current = queue.dequeue()
+      if current not in visited:
+        visited.add(current)
+        for neighbor in self.adjacency_list[current]:
+
+          if neighbor not in appended:
+            appended.add(neighbor)
+            level.append(neighbor)
+          
+          queue.enqueue(neighbor)
+        if level != []: traverse_order.append(level)
+    return traverse_order
+  
+  # reverse the return value of this method to get the topological sort of the graph
+  def dfs_traverse(self, source):
+    traverse_order = []
+    visited = set()
+    stack = Stack()
+    stack.push(source)
+    while not stack.is_empty():
+      current = stack.pop()
+      if current not in visited:
+        traverse_order.append(current)
+        visited.add(current)
+        for neighbor in self.adjacency_list[current]:
+          stack.push(neighbor)
+    return traverse_order
