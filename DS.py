@@ -192,11 +192,12 @@ class MinHeap:
 
 class Vertex:
 
-  def __init__(self, value=None):
+  def __init__(self, name, value=None):
     self.value = value
+    self.name = name
 
   def __hash__(self):
-    return hash(self.value)
+    return hash(f"{self.value}+{self.name}")
   
   def __eq__(self, other):
     return self.value == other.value
@@ -207,30 +208,47 @@ class Vertex:
   def __str__(self):
     return str(self.value)
 
+# Space: O(V) for vertices and O(E) for adjacency list. O(V+E)
 class Graph:
 
   def __init__(self):
     self.adjacency_list = {}
+    self.vertices = {}
   
   def add_undirected_edge(self, v1, v2):
-    if v1 in self.adjacency_list:
-      self.adjacency_list[v1].append(v2)
-    else:
-      self.adjacency_list[v1] = [v2]
+    # add vertex in vertices if not already there
+    if v1.name not in self.vertices:
+      self.vertices[v1.name] = v1
+    if v2.name not in self.vertices:
+      self.vertices[v2.name] = v2
     
-    if v2 in self.adjacency_list:
-      self.adjacency_list[v2].append(v1)
+    # add v2 in v1's adjacency list
+    if v1.name in self.adjacency_list:
+      self.adjacency_list[v1.name].append(v2.name)
     else:
-      self.adjacency_list[v2] = [v1]
+      self.adjacency_list[v1.name] = [v2.name]
+    
+    # add v1 in v2's adjacency list
+    if v2.name in self.adjacency_list:
+      self.adjacency_list[v2.name].append(v1.name)
+    else:
+      self.adjacency_list[v2.name] = [v1.name]
   
   def add_directed_edge(self, v1, v2):
-    if v1 in self.adjacency_list:
-      self.adjacency_list[v1].append(v2)
-    else:
-      self.adjacency_list[v1] = [v2]
+    # add vertex in vertices if not already there
+    if v1.name not in self.vertices:
+      self.vertices[v1.name] = v1
+    if v2.name not in self.vertices:
+      self.vertices[v2.name] = v2
     
-    if v2 not in self.adjacency_list:
-      self.adjacency_list[v2] = []
+    # add v2 in v1's adjacency list
+    if v1.name in self.adjacency_list:
+      self.adjacency_list[v1.name].append(v2.name)
+    else:
+      self.adjacency_list[v1.name] = [v2.name]
+    
+    if v2.name not in self.adjacency_list:
+      self.adjacency_list[v2.name] = []
   
   # this traverse will take some time more than O(V+E) as we are also building the traverse_order list [+ O(V.2E)].
   def bfs_traverse(self, source):
@@ -272,3 +290,19 @@ class Graph:
         for neighbor in self.adjacency_list[current]:
           stack.push(neighbor)
     return traverse_order
+  
+  def path_exists_bfs(self, v1, v2):
+    queue = Queue()
+    queue.enqueue(v1)
+    visited = set()
+    while not queue.is_empty():
+      current = queue.dequeue()
+      if current not in visited:
+        visited.add(current)
+        if current == v2:
+          return True
+        for neighbor in self.adjacency_list[current]:
+          if neighbor == v2:
+            return True
+          queue.enqueue(neighbor)
+    return False
