@@ -1,10 +1,14 @@
 import math
 
+# Nodes for data structures that need a reference to the next item
+
 class Node:
 
   def __init__(self, elem):
     self.value = elem
     self.next = None
+
+# Stack Implementation (Using builtin python lists which work like arrays)
 
 class Stack:
   
@@ -19,12 +23,15 @@ class Stack:
       string += f"{str(i)}\n"
     return string
 
+  # O(1)
   def is_empty(self):
     return len(self.arr) == 0
   
+  # O(1)
   def push(self, elem):
     self.arr.append(elem)
 
+  # O(1)
   def pop(self):
     return self.arr.pop()
 
@@ -32,6 +39,7 @@ class Stack:
     for i in reversed(self.arr):
       print(i)
 
+# Queue Implementation using a linked list
 
 class Queue:
 
@@ -47,9 +55,12 @@ class Queue:
       node = node.next
     return string
 
+
+  # O(1)
   def is_empty(self):
     return self.head == None
   
+  # O(1)
   def enqueue(self, elem):
     node = Node(elem)
     if self.head == None:
@@ -59,6 +70,7 @@ class Queue:
       self.tail.next = node
       self.tail = node
   
+  # O(1)
   def dequeue(self):
     if self.head == None: return None
     else:
@@ -66,12 +78,15 @@ class Queue:
       self.head = self.head.next
       return node.value
 
+# MaxHeap/Max-PriorityQueue implemented using arrays
+
 class MaxHeap:
 
   def __init__(self):
     self.arr = []
     self.end = -1
   
+  # Height, H = log(N)
   def get_height(self):
     return math.floor(math.log2(self.end + 1))
 
@@ -89,6 +104,7 @@ class MaxHeap:
       string += "\n"
     return string
 
+  # O(H)
   def reheap_up(self, index):
     if index == 0: return
     parent = (index - 1) // 2
@@ -96,6 +112,7 @@ class MaxHeap:
       self.arr[index], self.arr[parent] = self.arr[parent], self.arr[index]
       self.reheap_up(parent)
   
+  # O(H)
   def reheap_down(self, index):
     left = 2 * index + 1
     right = 2 * index + 2
@@ -114,11 +131,13 @@ class MaxHeap:
           self.arr[index], self.arr[right] = self.arr[right], self.arr[index]
           self.reheap_down(right)
   
+  # O(H)
   def enqueue(self, elem):
     self.arr.append(elem)
     self.end += 1
     self.reheap_up(self.end)
   
+  # O(H)
   def dequeue(self):
     if self.end == -1: return None
     else:
@@ -128,12 +147,15 @@ class MaxHeap:
       self.reheap_down(0)
       return popped
 
+# MinHeap/Min-PriorityQueue implemented using arrays
+
 class MinHeap:
   
     def __init__(self):
       self.arr = []
       self.end = -1
     
+    # Height, H = log(N)
     def get_height(self):
       return math.floor(math.log2(self.end + 1))
   
@@ -150,7 +172,8 @@ class MinHeap:
           string += " " * space + str(self.arr[2 ** i - 1 + j]) + " " * space
         string += "\n"
       return string
-  
+
+    # O(H)
     def reheap_up(self, index):
       if index == 0: return
       parent = (index - 1) // 2
@@ -158,6 +181,7 @@ class MinHeap:
         self.arr[index], self.arr[parent] = self.arr[parent], self.arr[index]
         self.reheap_up(parent)
     
+    # O(H)
     def reheap_down(self, index):
       left = 2 * index + 1
       right = 2 * index + 2
@@ -176,11 +200,13 @@ class MinHeap:
             self.arr[index], self.arr[right] = self.arr[right], self.arr[index]
             self.reheap_down(right)
     
+    # O(H)
     def enqueue(self, elem):
       self.arr.append(elem)
       self.end += 1
       self.reheap_up(self.end)
     
+    # O(H)
     def dequeue(self):
       if self.end == -1: return None
       else:
@@ -267,7 +293,7 @@ class Graph:
       if current not in visited:
         visited.add(current)
         for neighbor in self.adjacency_list[current]:
-
+          
           if neighbor not in appended:
             appended.add(neighbor)
             level.append(neighbor)
@@ -276,6 +302,7 @@ class Graph:
         if level != []: traverse_order.append(level)
     return traverse_order
   
+  # O(V+E)
   # reverse the return value of this method to get the topological sort of the graph
   def dfs_traverse(self, source):
     traverse_order = []

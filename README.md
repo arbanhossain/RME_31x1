@@ -7,8 +7,7 @@
 
 **DSA**:
 
-- [x] Stack, Queue, Heap, Graph
-- [ ] Heapsort, BFS, DFS, Dijkstra, Iterative Deepening
+Stack, Queue, Heap, Graph, Heapsort, BFS, DFS
 
 **AI**:
 
