@@ -240,8 +240,9 @@ class Graph:
   def __init__(self):
     self.adjacency_list = {}
     self.vertices = {}
+    self.weights = {}
   
-  def add_undirected_edge(self, v1, v2):
+  def add_undirected_edge(self, v1, v2, weight=1):
     # add vertex in vertices if not already there
     if v1.name not in self.vertices:
       self.vertices[v1.name] = v1
@@ -259,8 +260,19 @@ class Graph:
       self.adjacency_list[v2.name].append(v1.name)
     else:
       self.adjacency_list[v2.name] = [v1.name]
+    
+    # add weight in weights
+    if v1.name in self.weights:
+      self.weights[v1.name][v2.name] = weight
+    else:
+      self.weights[v1.name] = {v2.name: weight}
+    
+    if v2.name in self.weights:
+      self.weights[v2.name][v1.name] = weight
+    else:
+      self.weights[v2.name] = {v1.name: weight}
   
-  def add_directed_edge(self, v1, v2):
+  def add_directed_edge(self, v1, v2, weight=1):
     # add vertex in vertices if not already there
     if v1.name not in self.vertices:
       self.vertices[v1.name] = v1
@@ -275,6 +287,12 @@ class Graph:
     
     if v2.name not in self.adjacency_list:
       self.adjacency_list[v2.name] = []
+    
+    # add weight in weights
+    if v1.name in self.weights:
+      self.weights[v1.name][v2.name] = weight
+    else:
+      self.weights[v1.name] = {v2.name: weight}
   
   # this traverse will take some time more than O(V+E) as we are also building the traverse_order list [+ O(V.2E)].
   def bfs_traverse(self, source):
