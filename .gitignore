@@ -23,3 +23,13 @@ tags
 test.py
 test.cpp
 *.exe
+
+_minted-main
+*.aux
+*.bbl
+*.out
+*.log
+*.toc
+*.synctex.gz
+/Labs/*/main.pdf
+/Labs/*/header.tex
