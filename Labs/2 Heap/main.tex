@@ -19,6 +19,7 @@
 \usepackage{pdfpages}
 \usepackage{hyperref}
 \usepackage{minted}
+\usepackage{booktabs}
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -39,7 +40,7 @@
     \\
     Md. Arban Hossain (SH-092-005)\\
     }
-    \date{09 Feb 2023}
+    \date{10 Feb 2023}
 
 %%%%%%% End Document Header %%%%%%%
 
@@ -59,7 +60,7 @@
 
 
 %%%% Introduction to the General Template %%%%
-\subsection*{The A* Algorithm}
+\section*{The A* Algorithm}
 The A* algorithm is an informed search algorithm that uses a heuristic function to guide the search. The heuristic function is used to estimate the cost of the path from the current vertex to the destination. It is guaranteed to find the shortest path if the heuristic function is admissible. An admissible heuristic function is one that never overestimates the cost of the path from the current vertex to the destination.
 
 \[ h(n) \leq d(n) \]
@@ -70,42 +71,50 @@ $h(n)$ = The heuristic cost of the path from the vertex to destination
 
 $d(n)$ = The actual cost of the path from the vertex to destination
 
+\noindent
+If the original cost to reach a node from the source is denoted by $g(n)$, the modified cost for the node will be,
 
-\subsection*{Pen and Paper Simulation}
+\[f(n) = g(n) + h(n)\]
 
-Consider the following graph. The vertices are labeled with their names and the edges are labeled with their costs. The graph is directed.
+We can then run uniform cost search on the modified graph. At each step, we dequeue a node from the \textbf{Priority Queue} and check the neighbor nodes that can be reached immediately from it. If a neighbor node has a node cost that is greater than the cost of the current node plus the cost of the edge between them, we update the cost of the neighbor node and push it into the Priority Queue. We continue this process until have dequeued the destination node.
+
+\pagebreak
+
+
+Consider the following directed graph. The vertices are labeled with their names and the edges are labeled with their costs.
 
 \begin{center}
   \includegraphics[width=0.9\textwidth]{Graph.png}
 \end{center}
 
+% \section*{Pen and Paper Simulation}
+
 \subsection*{Heuristic 1}
 
 For the following set of heuristics, we can simulate the search process manually.
 
-% A table containing 2 columns, one for the vertex name and the other for the heuristic cost.
-\begin{center}
-  \begin{tabular}{|c|c|}
-    \hline
-    Vertex & Heuristic Cost\\
-    \hline
-    S & 8\\
-    \hline
-    A & 3\\
-    \hline
-    B & 7\\
-    \hline
-    C & 2\\
-    \hline
-    G & 0\\
-    \hline
+% A horizontal table containing 2 rows, one for the vertex name and the other for the heuristic cost.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{cc}
+  \toprule
+  \textbf{Vertex} & \textbf{Heuristic Cost} \\
+  \midrule
+  S & 8 \\
+  A & 3 \\
+  B & 7 \\
+  C & 2 \\
+  G & 0 \\
+  \bottomrule
   \end{tabular}
-\end{center}
+\end{table}
+
 
 % Add images of heuristic1_Page 1 to 6
 
 \begin{center}
-  \includegraphics[width=0.9\textwidth]{heuristic1_Page1.png}
+  \includegraphics[width=0.8\textwidth]{heuristic1_Page1.png}
 \end{center}
 
 \begin{center}
@@ -128,174 +137,78 @@ For the following set of heuristics, we can simulate the search process manually
   \includegraphics[width=0.9\textwidth]{heuristic1_Page6.png}
 \end{center}
 
-Before implementing the code, let's search through the graph manually documenting our process. Use vertex \#2 as our source and vertex \#1 as our destination.
+\noindent
+\textbf{Path Cost}: 2 + 4 + 3 = 9
 
-\vspace{5mm} %5mm vertical space
+\pagebreak
+\subsection*{Heuristic 2}
 
-To start the Breadth First Search, push the source vertex into a queue \textbf{Q}. Use a \textit{set} \textbf{Visited} to keep track of the visited vertices. At each iteration of the search, pop an item from the queue, mark it as visited, and check each of its neighboring vertices. We have found our path if one of the neighbors is the destination. Otherwise, push the neighbors into the queue if they have not been visited and resume the process. Terminate the process when we have: (a) reached our destination, or (b) visited all vertices reachable from the 
+For another set of heuristics, we can simulate the search and obtain another path.
 
-Before starting the search, the states of \textbf{Q} and \textbf{Visited} are:
+% A horizontal table containing 2 rows, one for the vertex name and the other for the heuristic cost.
 
-\textbf{Q}: 2
+\begin{table}[h]
+  \centering
+  \begin{tabular}{cc}
+  \toprule
+  \textbf{Vertex} & \textbf{Heuristic Cost} \\
+  \midrule
+  S & 7 \\
+  A & 4 \\
+  B & 5 \\
+  C & 2 \\
+  G & 0 \\
+  \bottomrule
+  \end{tabular}
+\end{table}
 
-\textbf{Visited}: \{\}
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page1.png}
+\end{center}
 
-\subsubsection*{Iteration 1}
-\begin{itemize}
-  \item Pop an item (2) from \textbf{Q}. Add it to \textbf{Visited}.
-  \item Check its neighbors. In this case, 3 and 0. None of them is the destination. None of them is in \textbf{Visited}.
-  \item Push 3 and 0 into \textbf{Q}.
-\end{itemize}
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page2.png}
+\end{center}
 
-\textbf{Q}: 3 0
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page3.png}
+\end{center}
 
-\textbf{Visited}: \{2\}
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page4.png}
+\end{center}
 
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page5.png}
+\end{center}
 
-\subsubsection*{Iteration 2}
-\begin{itemize}
-  \item Pop an item (3) from \textbf{Q}. Add it to \textbf{Visited}.
-  \item Check its neighbors. In this case, 3. It is not the destination. It is in \textbf{Visited}. So do nothing.
-\end{itemize}
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page6.png}
+\end{center}
 
-\textbf{Q}: 0
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page7.png}
+\end{center}
 
-\textbf{Visited}: \{2, 3\}
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{heuristic2_Page8.png}
+\end{center}
 
-
-
-\subsubsection*{Iteration 3}
-\begin{itemize}
-  \item Pop an item (0) from \textbf{Q}. Add it to \textbf{Visited}.
-  \item Check its neighbors. In this case, 2 and 1. One of them (1) is the destination. Add it to \textbf{Visited}. We can now terminate our search and return a \textbf{True} value.
-\end{itemize}
-
-\textbf{Q}: Empty
-
-\textbf{Visited}: \{2, 3, 0, 1\}
+\noindent
+\textbf{Path Cost}: 2 + 1 + 2 + 3 = 8
 
 \pagebreak
 \section*{Part B}
 
 \subsection*{Source Code}
-Python3 source code for the problem follows.
+Attached with the report.
 
-\begin{minted}
-[
-baselinestretch=1.2,
-fontsize=\footnotesize,
-]{python}
-### Lab1.py
-
-class Node:
-
-  def __init__(self, elem):
-    self.value = elem
-    self.next = None
-
-class Queue:
-
-  def __init__(self):
-    self.head = None
-    self.tail = None
-
-  # O(1)
-  def is_empty(self):
-    return self.head == None
-  
-  # O(1)
-  def enqueue(self, elem):
-    node = Node(elem)
-    if self.head == None:
-      self.head = node
-      self.tail = node
-    else:
-      self.tail.next = node
-      self.tail = node
-  
-  # O(1)
-  def dequeue(self):
-    if self.head == None: return None
-    else:
-      node = self.head
-      self.head = self.head.next
-      return node.value
-
-class Vertex:
-
-  def __init__(self, name, value=None):
-    self.value = value
-    self.name = name
-
-# Space: O(V) for vertices. O(E) for edges. Total O(V+E)
-class Graph:
-
-  def __init__(self):
-    self.adjacency_list = {}
-    self.vertices = {}
-  
-  def add_directed_edge(self, v1, v2):
-    # add vertex in vertices if not already there
-    if v1.name not in self.vertices:
-      self.vertices[v1.name] = v1
-    if v2.name not in self.vertices:
-      self.vertices[v2.name] = v2
-    
-    # add v2 in v1's adjacency list
-    if v1.name in self.adjacency_list:
-      self.adjacency_list[v1.name].append(v2.name)
-    else:
-      self.adjacency_list[v1.name] = [v2.name]
-    
-    if v2.name not in self.adjacency_list:
-      self.adjacency_list[v2.name] = []
-  
-  # Time: O(V+E)
-  # Space: O(V)
-  def path_exists_bfs(self, v1, v2):
-    queue = Queue()
-    queue.enqueue(v1)
-    visited = set()
-    while not queue.is_empty():
-      current = queue.dequeue()
-      if current not in visited:
-        visited.add(current)
-        if current == v2:
-          return True
-        for neighbor in self.adjacency_list[current]:
-          if neighbor == v2:
-            return True
-          queue.enqueue(neighbor)
-    return False
-
-
-
-if __name__ == "__main__":
-  no_of_vertices, edges, source = map(int, input().split())
-  
-  graph = Graph()
-
-  for _ in range(edges):
-    v1, v2 = [Vertex(x) for x in input().split()]
-    graph.add_directed_edge(v1, v2)
-  
-  for _ in range(int(input())):
-    v1, v2 = [x for x in input().split()]
-    print(graph.path_exists_bfs(v1, v2))
-\end{minted}
-\pagebreak
 \subsection*{Output}
-Using the provided input file, the output of the program was:
-\
+\begin{center}
+  \includegraphics[width=0.9\textwidth]{Output.png}
+\end{center}
 
-\subsection*{Complexity Analysis}
-\subsubsection*{Time Complexity}
-The function \textbf{path\_exists\_bfs()} iterates over all the vertices at most once. For each vertex, it iterates over all the edges it is connected to. During each iteration, it takes \textbf{O(1)} time for the \textit{push} and \textit{pop} operations of the queue. Looking up an item in a Python \textit{set} also takes \textbf{O(1)} time. Considering the graph has \textbf{V} vertices and \textbf{E} edges, in the worst case it will take \textbf{O(V+E)} time to finish the search.
-
-\subsubsection*{Space Complexity}
-The adjacency list is implemented using a Python dictionary. During each iteration, all neighboring vertices of the current vertex are present in the queue. In the worst case, this number can be equal to the number of total vertices in the graph. So it takes \textbf{O(V)} space.
-
-\subsection*{Links}
-The source files can be found at \href{https://github.com/arbanhossain/RME_31x1/tree/main/Labs}{github.com/arbanhossain/RME\_31x1}.
+\subsection*{Result Discussion}
+The search result achieved using the second set of heuristics was more optimal (lower path cost) because the heuristic function was admissible. The first set of heuristics was not admissible because the heuristic cost of the vertex B (7) was greater than the actual cost of the path from G to B (6).
 
 \end{document}
