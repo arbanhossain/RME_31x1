@@ -60,18 +60,18 @@ class MinHeap:
     def reheap_down(self, index):
       left = 2 * index + 1
       right = 2 * index + 2
-      if left > self.end: return
-      elif right > self.end:
-        if self.arr[index] > self.arr[left]:
+      if left > self.end: return # left doesnt exist
+      elif right > self.end: # right doesnt exist
+        if self.arr[index] > self.arr[left]: # if parent greater than left
           self.arr[index], self.arr[left] = self.arr[left], self.arr[index]
           self.reheap_down(left)
-      else:
-        if self.arr[left] < self.arr[right]:
-          if self.arr[index] > self.arr[left]:
+      else: # left and right both exist
+        if self.arr[left] < self.arr[right]: # which is lower - left or right, if left is lower
+          if self.arr[index] > self.arr[left]: # if paretn is greater than left
             self.arr[index], self.arr[left] = self.arr[left], self.arr[index]
             self.reheap_down(left)
-        else:
-          if self.arr[index] > self.arr[right]:
+        else: # if right is greater
+          if self.arr[index] > self.arr[right]: # if parent is greater than right
             self.arr[index], self.arr[right] = self.arr[right], self.arr[index]
             self.reheap_down(right)
     
@@ -108,6 +108,7 @@ class Graph:
     self.weights = {}
   
   def add_undirected_edge(self, v1, v2, weight=1):
+    #if v1.name == v2.name: return
     # add vertex in vertices if not already there
     if v1.name not in self.vertices:
       self.vertices[v1.name] = v1
@@ -128,16 +129,21 @@ class Graph:
     
     # add weight in weights
     if v1.name in self.weights:
+      if v2.name in self.weights[v1.name]:
+        if weight < self.weights[v1.name][v2.name]: self.weights[v1.name][v2.name] = weight
       self.weights[v1.name][v2.name] = weight
     else:
       self.weights[v1.name] = {v2.name: weight}
     
     if v2.name in self.weights:
+      if v1.name in self.weights[v2.name]:
+        if weight < self.weights[v2.name][v1.name]: self.weights[v2.name][v1.name] = weight
       self.weights[v2.name][v1.name] = weight
     else:
       self.weights[v2.name] = {v1.name: weight}
   
   def add_directed_edge(self, v1, v2, weight=1):
+    #if v1.name == v2.name: return
     # add vertex in vertices if not already there
     if v1.name not in self.vertices:
       self.vertices[v1.name] = v1
@@ -155,7 +161,10 @@ class Graph:
     
     # add weight in weights
     if v1.name in self.weights:
-      self.weights[v1.name][v2.name] = weight
+      if v2.name in self.weights[v1.name]:
+        if weight < self.weights[v1.name][v2.name]: self.weights[v1.name][v2.name] = weight
+      else:
+        self.weights[v1.name][v2.name] = weight
     else:
       self.weights[v1.name] = {v2.name: weight}
 
@@ -191,46 +200,59 @@ if __name__ == "__main__":
   s = Vertex("S")
   a = Vertex("A")
   b = Vertex("B")
-  c = Vertex("C")
-  g = Vertex("G")
+  d = Vertex("D")
 
-  graph.add_directed_edge(s, a, 2)
-  graph.add_directed_edge(s, b, 4)
+  graph.add_directed_edge(s, a, 1)
+  graph.add_directed_edge(s, b, 3)
   graph.add_directed_edge(a, b, 1)
-  graph.add_directed_edge(a, c, 4)
-  graph.add_directed_edge(b, c, 2)
-  graph.add_directed_edge(b, g, 6)
-  graph.add_directed_edge(c, g, 3)
+  graph.add_directed_edge(s, s, 3)
+  graph.add_directed_edge(a, d, 4)
+  graph.add_directed_edge(b, d, 1)
+  graph.add_directed_edge(b, d, 6)
+  graph.add_directed_edge(b, s, 4)
+  graph.add_directed_edge(a, a, 5)
+  # graph.add_directed_edge(a, a, 5)
+
 
   heuristics2 = {
-    "S": 7,
-    "A": 4,
-    "B": 5,
-    "C": 2,
-    "G": 0
+    "S": 3,
+    "A": 2,
+    "B": 1,
+    "D": 0
   }
 
   heuristics1 = {
     "S": 8,
     "A": 3,
     "B": 7,
-    "C": 2,
-    "G": 0
+    "D": 2
   }
 
-  for i, heuristic_table in enumerate([heuristics1, heuristics2]):
-    a_star_result = a_star(graph, heuristic_table, s, g)
-    print(f"Using Heuristic {i+1}:")
-    if a_star_result is not None:
-      print(f"Path Cost: {a_star_result}")
-      c = g
-      path = []
-      while c.parent is not None:
-        path.append(c.name)
-        c = c.parent
-      path.append(c.name)
-      print(f"Path: {path[::-1]}")
-    else:
-      print("No path found")
+  # for i, heuristic_table in enumerate([heuristics1, heuristics2]):
+  #   a_star_result = a_star(graph, heuristic_table, s, g)
+  #   print(f"Using Heuristic {i+1}:")
+  #   if a_star_result is not None:
+  #     print(f"Path Cost: {a_star_result}")
+  #     c = g
+  #     path = []
+  #     while c.parent is not None:
+  #       path.append(c.name)
+  #       c = c.parent
+  #     path.append(c.name)
+  #     print(f"Path: {path[::-1]}")
+  #   else:
+  #     print("No path found")
 
-    print("\n")
+  #   print("\n")
+
+  res = a_star(graph, heuristics2, s, d)
+
+  c = d
+  path = []
+  while c.parent is not None:
+    path.append(c.name)
+    c = c.parent
+  path.append(c.name)
+  print(graph.adjacency_list)
+  print(graph.weights)
+  print(path)
