@@ -26,68 +26,68 @@ class PriorityNode:
 
 class MinHeap:
   
-    def __init__(self):
-      self.arr = []
-      self.end = -1
-    
-    def get_height(self):
-      return math.floor(math.log2(self.end + 1))
+  def __init__(self):
+    self.arr = []
+    self.end = -1
   
-    def __str__(self):
-      string = ""
-      height = self.get_height()
-      max_elems = 2 ** height
+  def get_height(self):
+    return math.floor(math.log2(self.end + 1))
+
+  def __str__(self):
+    string = ""
+    height = self.get_height()
+    max_elems = 2 ** height
+
+    for i in range(height + 1):
+      elems = 2 ** i
+      space = max_elems // elems
+      for j in range(elems):
+        if 2 ** i - 1 + j > self.end: break
+        string += " " * space + str(self.arr[2 ** i - 1 + j]) + " " * space
+      string += "\n"
+    return string
+
+  def is_empty(self):
+    return self.end == -1
+
+  def reheap_up(self, index):
+    if index == 0: return
+    parent = (index - 1) // 2
+    if self.arr[index] < self.arr[parent]:
+      self.arr[index], self.arr[parent] = self.arr[parent], self.arr[index]
+      self.reheap_up(parent)
   
-      for i in range(height + 1):
-        elems = 2 ** i
-        space = max_elems // elems
-        for j in range(elems):
-          if 2 ** i - 1 + j > self.end: break
-          string += " " * space + str(self.arr[2 ** i - 1 + j]) + " " * space
-        string += "\n"
-      return string
-
-    def is_empty(self):
-      return self.end == -1
-
-    def reheap_up(self, index):
-      if index == 0: return
-      parent = (index - 1) // 2
-      if self.arr[index] < self.arr[parent]:
-        self.arr[index], self.arr[parent] = self.arr[parent], self.arr[index]
-        self.reheap_up(parent)
-    
-    def reheap_down(self, index):
-      left = 2 * index + 1
-      right = 2 * index + 2
-      if left > self.end: return # left doesnt exist
-      elif right > self.end: # right doesnt exist
-        if self.arr[index] > self.arr[left]: # if parent greater than left
+  def reheap_down(self, index):
+    left = 2 * index + 1
+    right = 2 * index + 2
+    if left > self.end: return # left doesnt exist
+    elif right > self.end: # right doesnt exist
+      if self.arr[index] > self.arr[left]: # if parent greater than left
+        self.arr[index], self.arr[left] = self.arr[left], self.arr[index]
+        self.reheap_down(left)
+    else: # left and right both exist
+      if self.arr[left] < self.arr[right]: # which is lower - left or right, if left is lower
+        if self.arr[index] > self.arr[left]: # if paretn is greater than left
           self.arr[index], self.arr[left] = self.arr[left], self.arr[index]
           self.reheap_down(left)
-      else: # left and right both exist
-        if self.arr[left] < self.arr[right]: # which is lower - left or right, if left is lower
-          if self.arr[index] > self.arr[left]: # if paretn is greater than left
-            self.arr[index], self.arr[left] = self.arr[left], self.arr[index]
-            self.reheap_down(left)
-        else: # if right is greater
-          if self.arr[index] > self.arr[right]: # if parent is greater than right
-            self.arr[index], self.arr[right] = self.arr[right], self.arr[index]
-            self.reheap_down(right)
+      else: # if right is greater
+        if self.arr[index] > self.arr[right]: # if parent is greater than right
+          self.arr[index], self.arr[right] = self.arr[right], self.arr[index]
+          self.reheap_down(right)
     
-    def enqueue(self, elem):
-      self.arr.append(elem)
-      self.end += 1
-      self.reheap_up(self.end)
-    
-    def dequeue(self):
-      if self.end == -1: return None
-      else:
-        self.arr[0], self.arr[self.end] = self.arr[self.end], self.arr[0]
-        self.end -= 1
-        popped = self.arr.pop()
-        self.reheap_down(0)
-        return popped
+  def enqueue(self, elem):
+    self.arr.append(elem)
+    self.end += 1
+    self.reheap_up(self.end)
+  
+  def dequeue(self):
+    if self.end == -1: return None
+    else:
+      self.arr[0], self.arr[self.end] = self.arr[self.end], self.arr[0]
+      self.end -= 1
+      popped = self.arr.pop()
+      self.reheap_down(0)
+      return popped
 
 class Vertex:
 
@@ -200,59 +200,49 @@ if __name__ == "__main__":
   s = Vertex("S")
   a = Vertex("A")
   b = Vertex("B")
-  d = Vertex("D")
+  c = Vertex("C")
+  g = Vertex("G")
 
-  graph.add_directed_edge(s, a, 1)
-  graph.add_directed_edge(s, b, 3)
+  graph.add_directed_edge(s, a, 2)
+  graph.add_directed_edge(s, b, 4)
   graph.add_directed_edge(a, b, 1)
-  graph.add_directed_edge(s, s, 3)
-  graph.add_directed_edge(a, d, 4)
-  graph.add_directed_edge(b, d, 1)
-  graph.add_directed_edge(b, d, 6)
-  graph.add_directed_edge(b, s, 4)
-  graph.add_directed_edge(a, a, 5)
+  graph.add_directed_edge(a, c, 4)
+  graph.add_directed_edge(b, c, 2)
+  graph.add_directed_edge(b, g, 6)
+  graph.add_directed_edge(c, g, 3)
   # graph.add_directed_edge(a, a, 5)
 
-
-  heuristics2 = {
-    "S": 3,
-    "A": 2,
-    "B": 1,
-    "D": 0
-  }
-
+  # KHARAP
   heuristics1 = {
     "S": 8,
     "A": 3,
     "B": 7,
-    "D": 2
+    "C": 2,
+    "G": 0,
   }
 
-  # for i, heuristic_table in enumerate([heuristics1, heuristics2]):
-  #   a_star_result = a_star(graph, heuristic_table, s, g)
-  #   print(f"Using Heuristic {i+1}:")
-  #   if a_star_result is not None:
-  #     print(f"Path Cost: {a_star_result}")
-  #     c = g
-  #     path = []
-  #     while c.parent is not None:
-  #       path.append(c.name)
-  #       c = c.parent
-  #     path.append(c.name)
-  #     print(f"Path: {path[::-1]}")
-  #   else:
-  #     print("No path found")
+  # BHALO
+  heuristics2 = {
+    "S": 7,
+    "A": 4,
+    "B": 5,
+    "C": 2,
+    "G": 0,
+  }
 
-  #   print("\n")
+  for i, heuristic_table in enumerate([heuristics1, heuristics2]):
+    a_star_result = a_star(graph, heuristic_table, s, g)
+    print(f"Using Heuristic {i+1}:")
+    if a_star_result is not None:
+      print(f"Path Cost: {a_star_result}")
+      c = g
+      path = []
+      while c.parent is not None:
+        path.append(c.name)
+        c = c.parent
+      path.append(c.name)
+      print(f"Path: {path[::-1]}")
+    else:
+      print("No path found")
 
-  res = a_star(graph, heuristics2, s, d)
-
-  c = d
-  path = []
-  while c.parent is not None:
-    path.append(c.name)
-    c = c.parent
-  path.append(c.name)
-  print(graph.adjacency_list)
-  print(graph.weights)
-  print(path)
+    print("\n")
