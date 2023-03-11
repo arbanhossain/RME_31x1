@@ -8,7 +8,6 @@ class Game:
     # randomly select current player
     self.current_player = 'X' if random.randint(0,1) == 0 else 'O'
     self.winner = None
-    self.game_over = False
   
   def switch_player(self):
     if self.current_player == 'X':
@@ -69,34 +68,98 @@ class AI:
           moves.append((i,j))
     return moves
   
-  def value(self, board, player):
+  def value_no_ab(self, board, player):
+    flag = True
+    for row in board:
+      for col in row:
+        if col != '-':
+          flag = False
+          break
+    if flag:
+      return [1, (random.randint(0,2), random.randint(0,2)), 1]
+    # print(alpha, beta)
     best_move = None
     if self.game.is_game_over(board):
       winner = self.game.check_winner(board)
       if winner == 'X':
-        return [1, best_move]
+        return [1, best_move, 1]
       elif winner == 'O':
-        return [-1, best_move]
+        return [-1, best_move, 1]
       else:
-        return [0, best_move]
+        return [0, best_move, 1]
     
+    ghurse = 0
     if player == 'X':
       best_score = -float('inf')
       for move in self.get_available_moves():
+        ghurse += 1
         board[move[0]][move[1]] = 'X'
-        score, _ = self.value(board, 'O')
+        score, _, bhitore_ghurse = self.value_no_ab(board, 'O')
+        ghurse += bhitore_ghurse
         board[move[0]][move[1]] = '-'
         if score > best_score:
           best_score = score
           best_move = move
-      return [best_score, best_move]
+      return [best_score, best_move, ghurse]
     else:
       best_score = float('inf')
       for move in self.get_available_moves():
+        ghurse += 1
         board[move[0]][move[1]] = 'O'
-        score, _ = self.value(board, 'X')
+        score, _, bhitore_ghurse = self.value_no_ab(board, 'X')
+        ghurse += bhitore_ghurse
         board[move[0]][move[1]] = '-'
         if score < best_score:
           best_score = score
           best_move = move
-      return [best_score, best_move]
+      return [best_score, best_move, ghurse]
+  
+  def value(self, board, player, alpha, beta):
+    flag = True
+    for row in board:
+      for col in row:
+        if col != '-':
+          flag = False
+          break
+    if flag:
+      return [1, (random.randint(0,2), random.randint(0,2)), 1]
+    # print(alpha, beta)
+    best_move = None
+    if self.game.is_game_over(board):
+      winner = self.game.check_winner(board)
+      if winner == 'X':
+        return [1, best_move, 1]
+      elif winner == 'O':
+        return [-1, best_move, 1]
+      else:
+        return [0, best_move, 1]
+    
+    ghurse = 0
+    if player == 'X':
+      best_score = -float('inf')
+      for move in self.get_available_moves():
+        ghurse += 1
+        board[move[0]][move[1]] = 'X'
+        score, _, bhitore_ghurse = self.value(board, 'O', alpha, beta)
+        ghurse += bhitore_ghurse
+        board[move[0]][move[1]] = '-'
+        if score > best_score:
+          best_score = score
+          best_move = move
+        if best_score >= beta: return [best_score, move, ghurse]
+        if best_score > alpha: alpha = best_score
+      return [best_score, best_move, ghurse]
+    else:
+      best_score = float('inf')
+      for move in self.get_available_moves():
+        ghurse += 1
+        board[move[0]][move[1]] = 'O'
+        score, _, bhitore_ghurse = self.value(board, 'X', alpha, beta)
+        ghurse += bhitore_ghurse
+        board[move[0]][move[1]] = '-'
+        if score < best_score:
+          best_score = score
+          best_move = move
+        if best_score <= alpha: return [best_score, move, ghurse]
+        if best_score < beta: beta = best_score
+      return [best_score, best_move, ghurse]
