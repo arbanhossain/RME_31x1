@@ -159,6 +159,9 @@ class MinHeap:
     def get_height(self):
       return math.floor(math.log2(self.end + 1))
   
+    def is_empty(self):
+      return len(self.arr) == 0
+    
     def __str__(self):
       string = ""
       height = self.get_height()
