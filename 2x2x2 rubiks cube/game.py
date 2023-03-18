@@ -182,7 +182,7 @@ def is_anti_move(move1: str, move2: str):
 
 # print_cube()
 # scramble = "R F F R R U U F R R F U U R'".split()
-scramble = "R' F U2 F' R F' U F R' U'".split()
+scramble = "U2 F' R2 F' R2 U R F U2 R'".split()
 # scramble = []
 for move in scramble:
     if move == 'R': move_R()
@@ -195,9 +195,10 @@ for move in scramble:
     elif move == 'F2': move_F2()
     elif move == 'U2': move_U2()
 # print_cube()
+print("SCRAMBLE: ", end="")
 print(" ".join(scramble))
-visited1 = []
-visited2 = []
+visited1 = {}
+visited2 = {}
 q = ModQueue()
 
 cube = [front, top, left, right, back, bottom]
@@ -222,8 +223,8 @@ mid_move = None
 solved = False
 start = time.time()
 while not (q.is_empty()):
-    if len(visited1)%1000 == 0: print(f"V1: {len(visited1)}")
-    if len(visited2)%1000 == 0: print(f"V2: {len(visited2)}")
+    # if len(visited1)%1000 == 0: print(f"V1: {len(visited1)}")
+    # if len(visited2)%1000 == 0: print(f"V2: {len(visited2)}")
     cube = q.dequeue()
     front, top, left, right, back, bottom = cube.value
     # print("CUBE")
@@ -233,10 +234,10 @@ while not (q.is_empty()):
         print("ALREADY SOLVED")
         exit()
 
-    if not any(v.value == cube.value for v in visited1):
+    if str(cube.value) not in visited1:
         # print('here')
         # e+=1
-        visited1.append(cube)
+        visited1[str(cube.value)] = cube
         # print("children")
         # print("-"*30)
         for move in moves:
@@ -244,12 +245,13 @@ while not (q.is_empty()):
             move["move"]()
             if is_cube_solved():
                 soln = Node([list(front), list(top), list(left), list(right), list(back), list(bottom)], move_name=move["move_name"], parent=cube)
+                visited1[str(soln.value)] = soln
                 solved = True
                 break
             
-            if any(v.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)] for v in visited2):
+            if str([list(front), list(top), list(left), list(right), list(back), list(bottom)]) in visited2:
                 soln = cube
-                mid = [x for x in visited2 if x.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)]][0]
+                mid = visited2[str([list(front), list(top), list(left), list(right), list(back), list(bottom)])]
                 mid_move = move["move_name"]
                 solved = True
                 break
@@ -262,15 +264,15 @@ while not (q.is_empty()):
     endcube = endq.dequeue()
     front, top, left, right, back, bottom = endcube.value
 
-    if not any(v.value == endcube.value for v in visited2):
+    if str(endcube.value) not in visited2:
         # print('nowhere')
-        visited2.append(endcube)
+        visited2[str(endcube.value)] = endcube
         for move in moves:
             if endcube.move_name and is_anti_move(endcube.move_name, move["move_name"]): continue
             move["move"]()
-            if any(v.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)] for v in visited1):
+            if str([list(front), list(top), list(left), list(right), list(back), list(bottom)]) in visited1:
                 mid = endcube
-                soln = [x for x in visited1 if x.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)]][0]
+                soln = visited1[str([list(front), list(top), list(left), list(right), list(back), list(bottom)])]
                 mid_move = inverses[move["move_name"]]
                 solved = True
                 break
@@ -286,7 +288,7 @@ print(time.time() - start)
 sols = []
 
 if soln is not None:
-    print("SOLUTION")
+    print("SOLUTION: ", end="")
     while soln is not None:
         if soln.move_name:
             sols.append(soln.move_name)
