@@ -1,6 +1,7 @@
 # needs more optimization
 
 import sys
+import time
 
 sys.path.append('..')
 from DS import Queue
@@ -153,6 +154,18 @@ moves = [
 
 ]
 
+inverses = {
+    "R": "R'",
+    "F": "F'",
+    "U": "U'",
+    "R'": "R",
+    "F'": "F",
+    "U'": "U",
+    "R2": "R2",
+    "F2": "F2",
+    "U2": "U2",
+}
+
 def print_cube():
     print(f"front {front}")
     print(f"top {top}")
@@ -165,19 +178,11 @@ def is_cube_solved():
     return len(set(front)) == len(set(top)) == len(set(left)) == len(set(right)) == len(set(back)) == len(set(bottom)) == 1
 
 def is_anti_move(move1: str, move2: str):
-    if move1 == move2:
-        if len(move1) == len(move2) == 2 and move1[1] == '2':
-            return True
-        return False
-    if move1 == move2 + "'":
-        return True
-    if move1 + "'" == move2:
-        return True
-    return False
+    return move1 == inverses[move2]
 
 # print_cube()
 # scramble = "R F F R R U U F R R F U U R'".split()
-scramble = "F' R U2 R2 F' U' R".split()
+scramble = "R' F U2 F' R F' U F R' U'".split()
 # scramble = []
 for move in scramble:
     if move == 'R': move_R()
@@ -189,20 +194,36 @@ for move in scramble:
     elif move == 'R2': move_R2()
     elif move == 'F2': move_F2()
     elif move == 'U2': move_U2()
-print_cube()
-visited = []
+# print_cube()
+print(" ".join(scramble))
+visited1 = []
+visited2 = []
 q = ModQueue()
 
 cube = [front, top, left, right, back, bottom]
 
 q.enqueue(Node(cube))
+endq = ModQueue()
+final = [
+    ["white", "white", "white", "white"],
+    ["green", "green", "green", "green"],
+    ["red", "red", "red", "red"],
+    ["orange", "orange", "orange", "orange"],
+    ["yellow", "yellow", "yellow", "yellow"],
+    ["blue", "blue", "blue", "blue"],
+]
+endq.enqueue(Node(final))
 
 e = 0
 
 soln = None
+mid = None
+mid_move = None
 solved = False
-while not q.is_empty():
-    if len(visited)%1000 == 0: print(len(visited))
+start = time.time()
+while not (q.is_empty()):
+    if len(visited1)%1000 == 0: print(f"V1: {len(visited1)}")
+    if len(visited2)%1000 == 0: print(f"V2: {len(visited2)}")
     cube = q.dequeue()
     front, top, left, right, back, bottom = cube.value
     # print("CUBE")
@@ -211,26 +232,56 @@ while not q.is_empty():
     if is_cube_solved():
         print("ALREADY SOLVED")
         exit()
-    if sorted(cube.value) not in visited:
+
+    if not any(v.value == cube.value for v in visited1):
+        # print('here')
         # e+=1
-        visited.append(sorted(cube.value))
+        visited1.append(cube)
         # print("children")
         # print("-"*30)
         for move in moves:
             if cube.move_name and is_anti_move(cube.move_name, move["move_name"]): continue
             move["move"]()
-            # print(move["move_name"])
-            # print_cube()
-            # print()
             if is_cube_solved():
                 soln = Node([list(front), list(top), list(left), list(right), list(back), list(bottom)], move_name=move["move_name"], parent=cube)
                 solved = True
                 break
+            
+            if any(v.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)] for v in visited2):
+                soln = cube
+                mid = [x for x in visited2 if x.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)]][0]
+                mid_move = move["move_name"]
+                solved = True
+                break
+            # print(move["move_name"])
+            # print_cube()
+            # print()
             q.enqueue(Node([list(front), list(top), list(left), list(right), list(back), list(bottom)], move_name=move["move_name"], parent=cube))
             move["inverse_move"]()
+    
+    endcube = endq.dequeue()
+    front, top, left, right, back, bottom = endcube.value
+
+    if not any(v.value == endcube.value for v in visited2):
+        # print('nowhere')
+        visited2.append(endcube)
+        for move in moves:
+            if endcube.move_name and is_anti_move(endcube.move_name, move["move_name"]): continue
+            move["move"]()
+            if any(v.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)] for v in visited1):
+                mid = endcube
+                soln = [x for x in visited1 if x.value == [list(front), list(top), list(left), list(right), list(back), list(bottom)]][0]
+                mid_move = inverses[move["move_name"]]
+                solved = True
+                break
+            endq.enqueue(Node([list(front), list(top), list(left), list(right), list(back), list(bottom)], move_name=move["move_name"], parent=endcube))
+            move["inverse_move"]()
+
     if solved:
         break
     # input()
+
+print(time.time() - start)
 
 sols = []
 
@@ -239,8 +290,17 @@ if soln is not None:
     while soln is not None:
         if soln.move_name:
             sols.append(soln.move_name)
-            print(soln.move_name)
-        print(soln.value)
+            # print(soln.move_name)
+        # print(soln.value)
         soln = soln.parent
 
-print(" ".join(sols[::-1]))
+sols = sols[::-1]
+if mid_move is not None: sols.append(mid_move)
+if mid is not None:
+    while mid is not None:
+        if mid.move_name:
+            sols.append(inverses[mid.move_name])
+        # print(mid.value)
+        mid = mid.parent
+
+print(" ".join(sols))
