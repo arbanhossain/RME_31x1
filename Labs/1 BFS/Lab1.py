@@ -1,8 +1,9 @@
 class Node:
 
-  def __init__(self, elem):
+  def __init__(self, elem, parent=None):
     self.value = elem
     self.next = None
+    self.parent = parent
 
 class Queue:
 
