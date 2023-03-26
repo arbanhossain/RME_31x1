@@ -85,6 +85,14 @@ class ChessBoard:
     def convert_coords_to_pos_string(self, row, col):
         return f"{list(LETTERS.keys())[col]}{8-row}"
 
+    def get_pieces_of_color(self, color):
+        pieces = []
+        for row in range(8):
+            for col in range(8):
+                if self.board[row][col] and self.board[row][col].split("_")[1] == color:
+                    pieces.append(self.convert_coords_to_pos_string(row, col))
+        return pieces
+
     def piece_at(self, row, col):
         return self.board[row][col]
     
@@ -96,9 +104,9 @@ class ChessBoard:
                     moves.append((row-2, col))
             if self.board[row-1][col] == 0:
                 moves.append((row-1, col))
-            if col != 0 and self.board[row-1][col-1] != 0 and self.board[row-1][col-1].split()[1] == "black":
+            if col != 0 and self.board[row-1][col-1] != 0 and self.board[row-1][col-1].split("_")[1] == "black":
                 moves.append((row-1, col-1))
-            if col != 7 and self.board[row-1][col+1] != 0 and self.board[row-1][col+1].split()[1] == "black":
+            if col != 7 and self.board[row-1][col+1] != 0 and self.board[row-1][col+1].split("_")[1] == "black":
                 moves.append((row-1, col+1))
         else:
             if row == 1:
@@ -106,9 +114,9 @@ class ChessBoard:
                     moves.append((row+2, col))
             if self.board[row+1][col] == 0:
                 moves.append((row+1, col))
-            if col != 0 and self.board[row+1][col-1] != 0 and self.board[row+1][col-1].split()[1] == "white":
+            if col != 0 and self.board[row+1][col-1] != 0 and self.board[row+1][col-1].split("_")[1] == "white":
                 moves.append((row+1, col-1))
-            if col != 7 and self.board[row+1][col+1] != 0 and self.board[row+1][col+1].split()[1] == "white":
+            if col != 7 and self.board[row+1][col+1] != 0 and self.board[row+1][col+1].split("_")[1] == "white":
                 moves.append((row+1, col+1))
         return moves
     
@@ -117,6 +125,49 @@ class ChessBoard:
         for row_delta, col_delta in PIECE_MOVE_DELTA["knight_" + color]:
             moves.append((row + row_delta, col + col_delta))
         return moves
+
+    def get_bishop_moves(self, row, col, color):
+        moves = []
+        deltas = [(1,1), (-1,1), (1,-1), (-1,-1)]
+        
+        for x in deltas:
+            for i in range(1, 8):
+                if row+i*x[0] < 0 or row+i*x[0] > 7 or col+i*x[1] < 0 or col+i*x[1] > 7: break
+                if self.board[row+i*x[0]][col+i*x[1]] != 0:
+                    if self.board[row+i*x[0]][col+i*x[1]].split("_")[1] != color:
+                        moves.append((row+i*x[0], col+i*x[1]))
+                    break
+                moves.append((row+i*x[0], col+i*x[1]))
+        return moves
+
+    def get_rook_moves(self, row, col, color):
+        moves = []
+        deltas = [(1,0), (-1,0), (0,1), (0,-1)]
+
+        for x in deltas:
+            for i in range(1, 8):
+                if row+i*x[0] < 0 or row+i*x[0] > 7 or col+i*x[1] < 0 or col+i*x[1] > 7: break
+                if self.board[row+i*x[0]][col+i*x[1]] != 0:
+                    if self.board[row+i*x[0]][col+i*x[1]].split("_")[1] != color:
+                        moves.append((row+i*x[0], col+i*x[1]))
+                    break
+                moves.append((row+i*x[0], col+i*x[1]))
+        return moves
+
+    def get_king_moves(self, row, col, color):
+        moves = []
+        for row_delta, col_delta in PIECE_MOVE_DELTA["king_" + color]:
+            moves.append((row + row_delta, col + col_delta))
+        
+        opposite_color = "black" if color is "white" else "white"
+
+        opposite_pieces = self.get_pieces_of_color(opposite_color)
+        opposite_moves = []
+        for piece in opposite_pieces:
+            opposite_moves += self.get_move(piece)
+        opposite_moves = set(opposite_moves)
+
+        return [move for move in moves if move not in opposite_moves]
 
     def get_move(self, pos_string):
         row, col =  self.convert_pos_string_to_coords(pos_string)
@@ -129,6 +180,14 @@ class ChessBoard:
             moves = self.get_pawn_moves(row, col, color)
         if piece == "knight":
             moves = self.get_knight_moves(row, col, color)
+        if piece == "bishop":
+            moves = self.get_bishop_moves(row, col, color)
+        if piece == "rook":
+            moves = self.get_rook_moves(row, col, color)
+        if piece == "queen":
+            moves = self.get_bishop_moves(row, col, color) + self.get_rook_moves(row, col, color)
+        if piece == "king":
+            moves = self.get_king_moves(row, col, color)
         # print(moves)
         n_moves = []
         for row, col in moves:

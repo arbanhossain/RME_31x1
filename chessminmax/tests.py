@@ -26,3 +26,5 @@ assert set(b.get_move("g2")) == set(["g3", "g4"])
 assert set(b.get_move("g7")) == set(["g6", "g5"])
 assert set(b.get_move("h2")) == set(["h3", "h4"])
 assert set(b.get_move("h7")) == set(["h6", "h5"])
+
+assert set(b.get_move("b1")) == set(["a3", "c3"])
